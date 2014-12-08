@@ -13,14 +13,13 @@ class consul::install {
 
   if $consul::install_method == 'url' {
 
-    #ensure_packages(['unzip'])
-
     staging::file { 'consul.zip':
       source => $consul::download_url
     } ->
     staging::extract { 'consul.zip':
       target  => $consul::bin_dir,
       creates => "${consul::bin_dir}/consul",
+      require => Package['unzip'],
     } ->
     file { "${consul::bin_dir}/consul":
       owner => 'root',
