@@ -15,8 +15,8 @@ class consul::run_service {
       cwd         => $consul::config_dir,
       path        => [$consul::bin_dir,'/bin','/usr/bin'],
       command     => "consul join ${consul::join_cluster}",
-      onlyif      => 'consul info | grep -P "(num_peers|known_servers)\s*=\s*0"',
-      subscribe   => Service['consul'],
+      onlyif      => "test `consul info | grep ${consul::join_cluster} | wc -l` -lt 1",
+      require   => Service['consul'],
     }
   }
 
@@ -26,7 +26,7 @@ class consul::run_service {
       path        => [$consul::bin_dir,'/bin','/usr/bin'],
       command     => "consul join -wan ${consul::join_wan}",
       onlyif      => "consul members -wan -detailed | grep -vP \"dc=${consul::config_hash['datacenter']}\" | grep -P 'alive'",
-      subscribe   => Service['consul'],
+      require   => Service['consul'],
     }
   }
 
